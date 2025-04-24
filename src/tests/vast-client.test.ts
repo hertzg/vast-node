@@ -1,22 +1,30 @@
-import axios from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { VastClient } from '../vast-client';
+
+// Add custom type definition for mocked axios instance
+interface MockAxiosInstance extends AxiosInstance {
+  request: jest.Mock;
+}
 
 // Mock axios
 jest.mock('axios', () => {
-  return {
-    create: jest.fn(() => ({
-      interceptors: {
-        response: {
-          use: jest.fn()
-        }
-      },
-      request: jest.fn(),
-      defaults: {
-        headers: {
-          common: {}
-        }
+  const mockRequestFn = jest.fn();
+  const mockAxiosInstance = {
+    interceptors: {
+      response: {
+        use: jest.fn()
       }
-    })),
+    },
+    request: mockRequestFn,
+    defaults: {
+      headers: {
+        common: {}
+      }
+    }
+  };
+  
+  return {
+    create: jest.fn(() => mockAxiosInstance),
     isAxiosError: jest.fn().mockReturnValue(true)
   };
 });
@@ -49,7 +57,8 @@ describe('VastClient', () => {
     
     await client.searchOffers(mockSearchParams);
     
-    const axiosInstance = mockedAxios.create();
+    // Cast the axios instance to our custom MockAxiosInstance type
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('GET');
@@ -62,7 +71,7 @@ describe('VastClient', () => {
     
     await client.getOffer(offerId);
     
-    const axiosInstance = mockedAxios.create();
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('GET');
@@ -77,7 +86,7 @@ describe('VastClient', () => {
     
     await client.listInstances(mockListParams);
     
-    const axiosInstance = mockedAxios.create();
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('GET');
@@ -95,7 +104,7 @@ describe('VastClient', () => {
     
     await client.createInstance(mockCreateParams);
     
-    const axiosInstance = mockedAxios.create();
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('PUT');
@@ -108,7 +117,7 @@ describe('VastClient', () => {
     
     await client.startInstance(instanceId);
     
-    const axiosInstance = mockedAxios.create();
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('PUT');
@@ -120,7 +129,7 @@ describe('VastClient', () => {
     
     await client.stopInstance(instanceId);
     
-    const axiosInstance = mockedAxios.create();
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('PUT');
@@ -132,7 +141,7 @@ describe('VastClient', () => {
     
     await client.deleteInstance(instanceId);
     
-    const axiosInstance = mockedAxios.create();
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('DELETE');
@@ -142,17 +151,17 @@ describe('VastClient', () => {
   test('should list images correctly', async () => {
     await client.listImages();
     
-    const axiosInstance = mockedAxios.create();
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('GET');
-    expect(lastCall.url).toBe('/api/v0/images');
+    expect(lastCall.url).toBe('/api/v0/docker-images');
   });
   
   test('should get user info correctly', async () => {
     await client.getUserInfo();
     
-    const axiosInstance = mockedAxios.create();
+    const axiosInstance = mockedAxios.create() as unknown as MockAxiosInstance;
     const lastCall = axiosInstance.request.mock.calls[0][0];
     
     expect(lastCall.method).toBe('GET');

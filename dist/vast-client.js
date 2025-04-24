@@ -84,7 +84,13 @@ class VastClient {
                 // Images endpoints
                 listImages: {
                     method: 'GET',
-                    path: '/api/v0/images',
+                    path: '/api/v0/docker-images',
+                    params: ['api_key'],
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    responseType: 'json',
                     retryConfig: { maxRetries: 3, retryDelay: 1000 }
                 },
                 // User endpoints
@@ -374,22 +380,28 @@ class VastClient {
     /**
      * List available docker images
      *
+     * @param params - Optional parameters
+     * @param params.api_key - API key to use for this request (overrides the global API key)
      * @returns Promise resolving to an array of available images
      *
      * @example
      * ```typescript
+     * // Using the global API key
      * const images = await client.listImages();
+     *
+     * // Or with an explicit API key
+     * const images = await client.listImages({ api_key: 'your-api-key' });
      * ```
      */
-    async listImages() {
-        console.log('Listing available images');
+    async listImages(params = {}) {
+        console.log('Listing available Docker images with params:', JSON.stringify(params, null, 2));
         try {
-            const result = await this.api.listImages();
-            console.log(`Found ${result.length} images`);
+            const result = await this.api.listImages(params);
+            console.log(`Found ${result.length} Docker images`);
             return result;
         }
         catch (error) {
-            console.error('Error listing images:', error);
+            console.error('Error listing Docker images:', error);
             throw error;
         }
     }

@@ -175,14 +175,22 @@ export declare class VastClient {
     /**
      * List available docker images
      *
+     * @param params - Optional parameters
+     * @param params.api_key - API key to use for this request (overrides the global API key)
      * @returns Promise resolving to an array of available images
      *
      * @example
      * ```typescript
+     * // Using the global API key
      * const images = await client.listImages();
+     *
+     * // Or with an explicit API key
+     * const images = await client.listImages({ api_key: 'your-api-key' });
      * ```
      */
-    listImages(): Promise<DockerImage[]>;
+    listImages(params?: {
+        api_key?: string;
+    }): Promise<DockerImage[]>;
     /**
      * Get current user information
      *
