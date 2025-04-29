@@ -113,7 +113,7 @@ export declare class VastClient {
      *
      * @param params - Instance creation parameters
      * @param params.image - Docker image to use (e.g., "pytorch/pytorch:latest")
-     * @param params.machineId - ID of the machine to use
+     * @param params.id - ID of the offer to use (obtained from searchOffers)
      * @param params.diskSpace - Disk space in GB
      * @param params.jupyterLab - Whether to enable JupyterLab
      * @param params.sshKeyIds - Array of SSH key IDs to add
@@ -126,7 +126,7 @@ export declare class VastClient {
      * ```typescript
      * const instance = await client.createInstance({
      *   image: "pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime",
-     *   machineId: 12345,
+     *   id: 12345, // Offer ID
      *   diskSpace: 20,
      *   jupyterLab: true,
      *   env: {

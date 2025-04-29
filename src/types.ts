@@ -5,77 +5,83 @@
 
 /**
  * API response for machine offers
+ *
+ * Note: The actual API uses snake_case, but we use camelCase in our TypeScript interface
+ * for better developer experience. The transformation is handled internally.
  */
 export interface MachineOffer {
   id: number;
-  cuda_max_good: number;
-  num_gpus: number;
-  gpu_name: string;
-  gpu_ram: number;
-  disk_space: number;
-  cpu_ram: number;
-  cpu_cores: number;
+  cudaMaxGood: number;         // API: cuda_max_good
+  numGpus: number;             // API: num_gpus
+  gpuName: string;             // API: gpu_name
+  gpuRam: number;              // API: gpu_ram
+  diskSpace: number;           // API: disk_space
+  cpuRam: number;              // API: cpu_ram
+  cpuCores: number;            // API: cpu_cores
   reliability: number;
   dlperf: number;
-  dlperf_per_dphtotal: number;
-  inet_up: number;
-  inet_down: number;
+  dlperfPerDphtotal: number;   // API: dlperf_per_dphtotal
+  inetUp: number;              // API: inet_up
+  inetDown: number;            // API: inet_down
   verification: string;
-  dph_total: number;
-  min_bid: number;
+  dphTotal: number;            // API: dph_total
+  minBid: number;              // API: min_bid
   datacenter: {
     id: number;
     geolocation: string;
   };
   external: boolean;
-  hosting_type: string;
-  direct_port_count: number;
-  gpu_frac?: number;
+  hostingType: string;         // API: hosting_type
+  directPortCount: number;     // API: direct_port_count
+  gpuFrac?: number;            // API: gpu_frac
   rented?: boolean;
   hostname?: string;
-  driver_version?: string;
-  cuda_version?: string;
+  driverVersion?: string;      // API: driver_version
+  cudaVersion?: string;        // API: cuda_version
 }
 
 /**
  * API response for instance details
+ *
+ * Note: The actual API uses snake_case, but we use camelCase in our TypeScript interface
+ * for better developer experience. The transformation is handled internally.
  */
 export interface Instance {
   id: number;
-  machine_id: number;
-  actual_status: string;
-  cur_state: string;
-  next_state?: string;
-  image_uuid: string;
-  image_runtype: string;
-  image_args?: string;
+  machineId: number;           // API: machine_id
+  actualStatus: string;        // API: actual_status
+  curState: string;            // API: cur_state
+  nextState?: string;          // API: next_state
+  imageUuid: string;           // API: image_uuid
+  imageRuntype: string;        // API: image_runtype
+  imageArgs?: string;          // API: image_args
   env?: Record<string, string>;
-  extra_env?: Record<string, string>;
-  disk_usage?: number;
-  disk_space?: number;
-  ssh_port?: number;
-  ssh_idx?: number;
-  ssh_host?: string;
-  ssh_key_id?: number;
-  ssh_proxy_command?: string;
-  intended_status: string;
-  start_date?: string;
-  end_date?: string;
-  jupyter_token?: string;
-  jupyter_url?: string;
-  status_msg?: string;
+  extraEnv?: Record<string, string>; // API: extra_env
+  diskUsage?: number;          // API: disk_usage
+  diskSpace?: number;          // API: disk_space
+  sshPort?: number;            // API: ssh_port
+  sshIdx?: number;             // API: ssh_idx
+  sshHost?: string;            // API: ssh_host
+  sshKeyId?: number;           // API: ssh_key_id
+  sshProxyCommand?: string;    // API: ssh_proxy_command
+  intendedStatus: string;      // API: intended_status
+  startDate?: string;          // API: start_date
+  endDate?: string;            // API: end_date
+  jupyterToken?: string;       // API: jupyter_token
+  jupyterUrl?: string;         // API: jupyter_url
+  statusMsg?: string;          // API: status_msg
   hostname?: string;
-  gpu_ct?: number;
-  gpu_name?: string;
-  gpu_mem?: number;
-  cpu_cores?: number;
-  cpu_mem?: number;
-  inet_up: number;
-  inet_down: number;
-  price_per_hour?: number;
-  cost_per_hour?: number;
-  min_bid?: number;
-  num_gpus?: number;
+  gpuCt?: number;              // API: gpu_ct
+  gpuName?: string;            // API: gpu_name
+  gpuMem?: number;             // API: gpu_mem
+  cpuCores?: number;           // API: cpu_cores
+  cpuMem?: number;             // API: cpu_mem
+  inetUp: number;              // API: inet_up
+  inetDown: number;            // API: inet_down
+  pricePerHour?: number;       // API: price_per_hour
+  costPerHour?: number;        // API: cost_per_hour
+  minBid?: number;             // API: min_bid
+  numGpus?: number;            // API: num_gpus
   machine?: {
     id: number;
     hostname: string;
@@ -131,35 +137,35 @@ export interface UserInfo {
  * Parameters for searching machine offers
  */
 export interface SearchOffersParams {
-  cuda_max_good?: number;
-  cuda_vers?: number;
-  disk_space?: number;
+  cudaMaxGood?: number;      // API: cuda_max_good
+  cudaVers?: number;         // API: cuda_vers
+  diskSpace?: number;        // API: disk_space
   external?: boolean;
-  inet_down?: number;
-  inet_up?: number;
-  min_bid?: number;
-  num_gpus?: number;
-  order?: string;
+  inetDown?: number;         // API: inet_down
+  inetUp?: number;           // API: inet_up
+  minBid?: number;           // API: min_bid
+  numGpus?: number;          // API: num_gpus
+  orderBy?: string;          // API: order
   q?: string;
   verified?: boolean;
   type?: string;
-  storage_size?: number;
+  storageSize?: number;      // API: storage_size
   reliability?: number;
-  direct_port_count?: number;
+  directPortCount?: number;  // API: direct_port_count
 }
 
 /**
  * Parameters for creating a new instance
  */
 export interface CreateInstanceParams {
+  id: number; // Use 'id' to match the endpoint path parameter
   image: string;
-  machineId: number;
   diskSpace?: number;
   jupyterLab?: boolean;
   sshKeyIds?: number[];
   runCommand?: string;
   env?: Record<string, string>;
-  [key: string]: any;
+  [key: string]: any; // Allow other properties
 }
 
 /**

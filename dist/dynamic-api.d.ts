@@ -23,6 +23,7 @@ export interface EndpointConfig<T extends Record<string, any> = Record<string, a
     responseType?: AxiosRequestConfig['responseType'];
     rateLimitPerSecond?: number;
     retryConfig?: RetryConfig;
+    ignoreGlobalAuth?: boolean;
 }
 /**
  * Configuration for request retry behavior
@@ -67,9 +68,9 @@ export type ApiResponse<T> = Promise<T>;
  * @internal
  */
 export declare class RequestQueue {
-    private concurrency;
     private queue;
     private running;
+    private concurrency;
     constructor(concurrency: number);
     enqueue<T>(task: () => Promise<T>): Promise<T>;
     private runNext;

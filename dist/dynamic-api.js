@@ -14,14 +14,59 @@ exports.DynamicApi = exports.RequestQueue = void 0;
 const axios_1 = __importDefault(require("axios"));
 const limiter_1 = require("limiter");
 /**
+ * Utility functions for parameter name transformation
+ * VAST.ai API requires snake_case parameter names like the Python client uses,
+ * but our TypeScript/JavaScript API uses camelCase for better developer experience.
+ */
+/**
+ * Convert a camelCase string to snake_case
+ * Example: "diskSpace" -> "disk_space"
+ */
+function camelToSnakeCase(str) {
+    return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+}
+/**
+ * Recursively transform all keys in an object from camelCase to snake_case
+ */
+function transformToSnakeCase(obj) {
+    if (obj === null || obj === undefined || typeof obj !== 'object' || Array.isArray(obj)) {
+        return obj;
+    }
+    const result = {};
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const snakeCaseKey = camelToSnakeCase(key);
+            const value = obj[key];
+            // Recursively transform nested objects
+            if (value !== null && typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    // Handle array of objects
+                    result[snakeCaseKey] = value.map(item => typeof item === 'object' && item !== null
+                        ? transformToSnakeCase(item)
+                        : item);
+                }
+                else {
+                    // Handle nested object
+                    result[snakeCaseKey] = transformToSnakeCase(value);
+                }
+            }
+            else {
+                // Handle primitive values
+                result[snakeCaseKey] = value;
+            }
+        }
+    }
+    return result;
+}
+/**
  * Queue that limits the number of concurrent requests
  * @internal
  */
 class RequestQueue {
     constructor(concurrency) {
-        this.concurrency = concurrency;
         this.queue = [];
         this.running = 0;
+        this.concurrency = concurrency;
     }
     enqueue(task) {
         return new Promise((resolve, reject) => {
@@ -123,11 +168,20 @@ class DynamicApi {
         var _a, _b, _c;
         const { method, path, params = [], headers = {}, responseType, retryConfig } = endpoint;
         let url = path;
-        // Replace path parameters
+        // Replace path parameters and collect query parameters
+        const queryParams = {};
         for (const param of params) {
             const paramKey = String(param);
             if (data[paramKey] !== undefined) {
-                url = url.replace(`:${paramKey}`, encodeURIComponent(data[paramKey]));
+                // If the parameter is for the path, replace it in the URL
+                if (url.includes(`:${paramKey}`)) {
+                    url = url.replace(`:${paramKey}`, encodeURIComponent(data[paramKey]));
+                }
+                else {
+                    // Otherwise, it's a query parameter
+                    queryParams[paramKey] = data[paramKey];
+                }
+                // Delete the parameter from the original data object after processing
                 delete data[paramKey];
             }
         }
@@ -138,12 +192,26 @@ class DynamicApi {
             headers: { ...headers, ...config.headers },
             responseType,
         };
+        // Remove Authorization header if ignoreGlobalAuth is true for this endpoint
+        if (endpoint.ignoreGlobalAuth && axiosConfig.headers) {
+            console.log('Ignoring global Authorization header for this endpoint.');
+            delete axiosConfig.headers['Authorization'];
+        }
+        // Transform remaining data (not used for path or query params) from camelCase to snake_case
+        const transformedData = transformToSnakeCase(data);
+        // The remaining transformedData goes into the request body for appropriate methods
         if (['POST', 'PUT', 'PATCH'].includes(method)) {
-            axiosConfig.data = data;
+            axiosConfig.data = transformedData;
         }
-        else {
-            axiosConfig.params = data;
-        }
+        // Assign the collected query parameters
+        axiosConfig.params = queryParams;
+        console.log('Request config before sending:', {
+            method: axiosConfig.method,
+            url: axiosConfig.url,
+            headers: axiosConfig.headers,
+            params: axiosConfig.params,
+            data: axiosConfig.data,
+        });
         const finalRetryConfig = {
             maxRetries: (retryConfig === null || retryConfig === void 0 ? void 0 : retryConfig.maxRetries) || ((_a = this.config.globalRetryConfig) === null || _a === void 0 ? void 0 : _a.maxRetries) || 3,
             retryDelay: (retryConfig === null || retryConfig === void 0 ? void 0 : retryConfig.retryDelay) || ((_b = this.config.globalRetryConfig) === null || _b === void 0 ? void 0 : _b.retryDelay) || 1000,

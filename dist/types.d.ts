@@ -4,76 +4,82 @@
  */
 /**
  * API response for machine offers
+ *
+ * Note: The actual API uses snake_case, but we use camelCase in our TypeScript interface
+ * for better developer experience. The transformation is handled internally.
  */
 export interface MachineOffer {
     id: number;
-    cuda_max_good: number;
-    num_gpus: number;
-    gpu_name: string;
-    gpu_ram: number;
-    disk_space: number;
-    cpu_ram: number;
-    cpu_cores: number;
+    cudaMaxGood: number;
+    numGpus: number;
+    gpuName: string;
+    gpuRam: number;
+    diskSpace: number;
+    cpuRam: number;
+    cpuCores: number;
     reliability: number;
     dlperf: number;
-    dlperf_per_dphtotal: number;
-    inet_up: number;
-    inet_down: number;
+    dlperfPerDphtotal: number;
+    inetUp: number;
+    inetDown: number;
     verification: string;
-    dph_total: number;
-    min_bid: number;
+    dphTotal: number;
+    minBid: number;
     datacenter: {
         id: number;
         geolocation: string;
     };
     external: boolean;
-    hosting_type: string;
-    direct_port_count: number;
-    gpu_frac?: number;
+    hostingType: string;
+    directPortCount: number;
+    gpuFrac?: number;
     rented?: boolean;
     hostname?: string;
-    driver_version?: string;
-    cuda_version?: string;
+    driverVersion?: string;
+    cudaVersion?: string;
 }
 /**
  * API response for instance details
+ *
+ * Note: The actual API uses snake_case, but we use camelCase in our TypeScript interface
+ * for better developer experience. The transformation is handled internally.
  */
 export interface Instance {
     id: number;
-    machine_id: number;
-    actual_status: string;
-    cur_state: string;
-    next_state?: string;
-    image_uuid: string;
-    image_runtype: string;
-    image_args?: string;
+    machineId: number;
+    actualStatus: string;
+    curState: string;
+    nextState?: string;
+    imageUuid: string;
+    imageRuntype: string;
+    imageArgs?: string;
     env?: Record<string, string>;
-    extra_env?: Record<string, string>;
-    disk_usage?: number;
-    disk_space?: number;
-    ssh_port?: number;
-    ssh_idx?: number;
-    ssh_host?: string;
-    ssh_key_id?: number;
-    ssh_proxy_command?: string;
-    intended_status: string;
-    start_date?: string;
-    end_date?: string;
-    jupyter_token?: string;
-    jupyter_url?: string;
-    status_msg?: string;
+    extraEnv?: Record<string, string>;
+    diskUsage?: number;
+    diskSpace?: number;
+    sshPort?: number;
+    sshIdx?: number;
+    sshHost?: string;
+    sshKeyId?: number;
+    sshProxyCommand?: string;
+    intendedStatus: string;
+    startDate?: string;
+    endDate?: string;
+    jupyterToken?: string;
+    jupyterUrl?: string;
+    statusMsg?: string;
     hostname?: string;
-    gpu_ct?: number;
-    gpu_name?: string;
-    gpu_mem?: number;
-    cpu_cores?: number;
-    cpu_mem?: number;
-    inet_up: number;
-    inet_down: number;
-    price_per_hour?: number;
-    cost_per_hour?: number;
-    min_bid?: number;
-    num_gpus?: number;
+    gpuCt?: number;
+    gpuName?: string;
+    gpuMem?: number;
+    cpuCores?: number;
+    cpuMem?: number;
+    inetUp: number;
+    inetDown: number;
+    pricePerHour?: number;
+    costPerHour?: number;
+    minBid?: number;
+    numGpus?: number;
     machine?: {
         id: number;
         hostname: string;
@@ -126,28 +132,28 @@ export interface UserInfo {
  * Parameters for searching machine offers
  */
 export interface SearchOffersParams {
-    cuda_max_good?: number;
-    cuda_vers?: number;
-    disk_space?: number;
+    cudaMaxGood?: number;
+    cudaVers?: number;
+    diskSpace?: number;
     external?: boolean;
-    inet_down?: number;
-    inet_up?: number;
-    min_bid?: number;
-    num_gpus?: number;
-    order?: string;
+    inetDown?: number;
+    inetUp?: number;
+    minBid?: number;
+    numGpus?: number;
+    orderBy?: string;
     q?: string;
     verified?: boolean;
     type?: string;
-    storage_size?: number;
+    storageSize?: number;
     reliability?: number;
-    direct_port_count?: number;
+    directPortCount?: number;
 }
 /**
  * Parameters for creating a new instance
  */
 export interface CreateInstanceParams {
+    id: number;
     image: string;
-    machineId: number;
     diskSpace?: number;
     jupyterLab?: boolean;
     sshKeyIds?: number[];

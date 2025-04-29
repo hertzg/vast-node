@@ -65,6 +65,8 @@ export class VastClient {
         listInstances: { 
           method: 'GET', 
           path: '/api/v0/instances', 
+          params: ['api_key'], // Include api_key for query param
+          ignoreGlobalAuth: true, // Ignore the global Authorization header for this endpoint
           retryConfig: { maxRetries: 3, retryDelay: 1000 }
         },
         getInstance: { 
@@ -73,9 +75,11 @@ export class VastClient {
           params: ['id'],
           retryConfig: { maxRetries: 2, retryDelay: 500 }
         },
-        createInstance: { 
-          method: 'PUT', 
-          path: '/api/v0/instances', 
+        createInstance: {
+          method: 'PUT',
+          path: '/api/v0/asks/:id', // Use the /asks endpoint with offer ID in path
+          params: ['id', 'api_key'], // Include id for path interpolation and api_key for query param
+          ignoreGlobalAuth: true, // Ignore the global Authorization header for this endpoint
           retryConfig: { maxRetries: 3, retryDelay: 1000 }
         },
         startInstance: { 
@@ -87,13 +91,15 @@ export class VastClient {
         stopInstance: { 
           method: 'PUT', 
           path: '/api/v0/instances/:id/stop', 
-          params: ['id'],
+          params: ['id', 'api_key'], // Include api_key for query param
+          ignoreGlobalAuth: true, // Ignore the global Authorization header for this endpoint
           retryConfig: { maxRetries: 3, retryDelay: 1000 }
         },
         deleteInstance: { 
-          method: 'DELETE', 
-          path: '/api/v0/instances/:id', 
-          params: ['id'],
+          method: 'DELETE', // Use DELETE method for destroying
+          path: '/api/v0/instances/:id', // Use the instance ID in the path
+          params: ['id', 'api_key'], // Include api_key for query param
+          ignoreGlobalAuth: true, // Ignore the global Authorization header for this endpoint
           retryConfig: { maxRetries: 3, retryDelay: 1000 }
         },
         
@@ -259,10 +265,27 @@ export class VastClient {
    */
   async listInstances(params: ListInstancesParams = {}): Promise<Instance[]> {
     console.log('Listing instances with params:', JSON.stringify(params, null, 2));
+    
+    // Include api_key in params for this specific endpoint
+    const paramsWithApiKey = {
+      ...params,
+      api_key: this.apiKey // Include API key as a parameter
+    };
+
     try {
-      const result = await this.api.listInstances(params);
-      console.log(`Found ${result.length} instances`);
-      return result;
+      // Pass an empty Authorization header to override the global one for this request
+      const result = await this.api.listInstances(paramsWithApiKey, {
+        headers: {
+          Authorization: ''
+        }
+      });
+      console.log('Raw listInstances result:', JSON.stringify(result, null, 2)); // Log raw result
+      
+      // The API returns an object with an 'instances' key containing the array
+      const instances = result && result.instances ? result.instances : [];
+      
+      console.log(`Found ${instances.length} instances`);
+      return instances; // Return the array of instances
     } catch (error) {
       console.error('Error listing instances:', error);
       throw error;
@@ -296,7 +319,7 @@ export class VastClient {
    *
    * @param params - Instance creation parameters
    * @param params.image - Docker image to use (e.g., "pytorch/pytorch:latest")
-   * @param params.machineId - ID of the machine to use
+   * @param params.id - ID of the offer to use (obtained from searchOffers)
    * @param params.diskSpace - Disk space in GB
    * @param params.jupyterLab - Whether to enable JupyterLab
    * @param params.sshKeyIds - Array of SSH key IDs to add
@@ -309,7 +332,7 @@ export class VastClient {
    * ```typescript
    * const instance = await client.createInstance({
    *   image: "pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime",
-   *   machineId: 12345,
+   *   id: 12345, // Offer ID
    *   diskSpace: 20,
    *   jupyterLab: true,
    *   env: {
@@ -319,11 +342,35 @@ export class VastClient {
    * ```
    */
   async createInstance(params: CreateInstanceParams): Promise<Instance> {
-    console.log('Creating instance with params:', JSON.stringify(params, null, 2));
+    console.log('Creating instance with input params:', JSON.stringify(params, null, 2));
+    
+    // Structure the data for the API call
+    const apiData: any = {
+      ...params,
+      id: params.id, // Include id for path parameter replacement
+      api_key: this.apiKey // Include API key in the data object
+    };
+
+    // Remove machineId from the data sent in the request body (if it somehow still exists)
+    delete apiData.machineId;
+
+    console.log('Data object prepared for DynamicApi:', JSON.stringify(apiData, null, 2));
+
     try {
-      const result = await this.api.createInstance(params);
-      console.log(`Created instance with ID: ${result.id}`);
-      return result;
+      // Pass an empty Authorization header to override the global one for this request
+      const result = await this.api.createInstance(apiData, {
+        headers: {
+          Authorization: ''
+        }
+      });
+      
+      // Extract the new_contract ID from the result
+      const instanceId = result && result.new_contract ? result.new_contract : undefined;
+      
+      console.log(`Created instance with ID: ${instanceId}`);
+      
+      // Return the result, which should now include the instance ID
+      return result; 
     } catch (error) {
       console.error('Error creating instance:', error);
       throw error;
@@ -367,7 +414,11 @@ export class VastClient {
   async stopInstance(id: number): Promise<any> {
     console.log(`Stopping instance with ID: ${id}`);
     try {
-      const result = await this.api.stopInstance({ id });
+      const result = await this.api.stopInstance({ id, api_key: this.apiKey }, {
+        headers: {
+          Authorization: ''
+        }
+      });
       console.log(`Instance ${id} stop request successful`);
       return result;
     } catch (error) {
@@ -390,7 +441,11 @@ export class VastClient {
   async deleteInstance(id: number): Promise<any> {
     console.log(`Deleting instance with ID: ${id}`);
     try {
-      const result = await this.api.deleteInstance({ id });
+      const result = await this.api.deleteInstance({ id, api_key: this.apiKey }, {
+        headers: {
+          Authorization: ''
+        }
+      });
       console.log(`Instance ${id} delete request successful`);
       return result;
     } catch (error) {
