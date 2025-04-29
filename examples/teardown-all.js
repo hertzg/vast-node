@@ -21,33 +21,36 @@ async function teardownAllInstances() {
 
     // STEP 1: List all instances for the current user
     console.log('\n1. Listing all instances...');
-    const instances = await client.listInstances({ owner: 'me' });
+    // Get instances and handle both possible return formats
+    const result = await client.listInstances({ owner: 'me' });
+    
+    // Extract instances array from the response, handling different possible formats
+    let instances = [];
+    if (result) {
+      if (Array.isArray(result)) {
+        instances = result;
+      } else if (result.instances && Array.isArray(result.instances)) {
+        instances = result.instances;
+      }
+    }
 
+    console.log(`Raw instances data:`, JSON.stringify(instances, null, 2));
+    
     // Check if we have any instances
     if (!instances || instances.length === 0) {
       console.log('No instances found for the current user.');
       return;
     }
 
-    console.log(`Found ${instances.length} instances.`);
-
-    // Filter for running instances using a more robust comparison
-    const runningInstances = instances.filter(instance => 
-      instance.actual_status && typeof instance.actual_status === 'string' && 
-      instance.actual_status.trim().toLowerCase() === 'running'
-    );
-
-    if (runningInstances.length === 0) {
-      console.log('No running instances found.');
-      return;
-    }
-
-    console.log(`Found ${runningInstances.length} running instances.`);
+    console.log(`Found ${instances.length} instances - proceeding to tear them all down.`);
+    
+    // Process ALL instances regardless of status
+    const instancesToTerminate = instances;
 
     // STEP 2: Tear down each running instance
-    console.log('\n2. Tearing down running instances...');
+    console.log('\n2. Tearing down ALL instances...');
 
-    for (const instance of runningInstances) {
+    for (const instance of instancesToTerminate) {
       const instanceId = instance.id;
       console.log(`  - Tearing down instance ${instanceId}...`);
       try {

@@ -74,13 +74,13 @@ describe('VastClient', () => {
       (client as any).api.searchOffers = jest.fn().mockResolvedValue(mockResponse);
       
       // Call the method
-      const result = await client.searchOffers({ num_gpus: 1, cuda_max_good: 11.7 });
+      const result = await client.searchOffers({ numGpus: 1, cudaMaxGood: 11.7 });
       
       // Verify the result
       expect(result).toEqual(mockResponse);
       expect((client as any).api.searchOffers).toHaveBeenCalledWith({
-        num_gpus: 1,
-        cuda_max_good: 11.7
+        numGpus: 1,
+        cudaMaxGood: 11.7
       });
     });
     
@@ -138,7 +138,7 @@ describe('VastClient', () => {
       // Call the method
       const createParams = {
         image: 'pytorch/pytorch:latest',
-        machineId: 1234,
+        id: 1234, // Changed from machineId to id to match CreateInstanceParams
         diskSpace: 20
       };
       

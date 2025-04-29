@@ -51,8 +51,8 @@ describe('VastClient', () => {
   
   test('should search offers with correct parameters', async () => {
     const mockSearchParams = {
-      num_gpus: 1,
-      cuda_max_good: 11.5
+      numGpus: 1,
+      cudaMaxGood: 11.5
     };
     
     await client.searchOffers(mockSearchParams);
@@ -97,7 +97,7 @@ describe('VastClient', () => {
   test('should create a new instance with correct parameters', async () => {
     const mockCreateParams = {
       image: 'pytorch/pytorch:latest',
-      machineId: 12345,
+      id: 12345, // Changed from machineId to id to match CreateInstanceParams
       diskSpace: 10,
       jupyterLab: true
     };
