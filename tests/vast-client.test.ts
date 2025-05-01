@@ -96,8 +96,8 @@ describe('VastClient', () => {
   
   describe('listInstances', () => {
     it('should call the listInstances API with the provided parameters', async () => {
-      // Setup the mock API response
-      const mockResponse = [
+      // Setup the mock API response - note the instances property required by the implementation
+      const mockInstances = [
         {
           id: 5678,
           machine_id: 1234,
@@ -107,17 +107,28 @@ describe('VastClient', () => {
         }
       ];
       
+      const mockResponse = {
+        instances: mockInstances
+      };
+      
       // Mock the API implementation
       (client as any).api.listInstances = jest.fn().mockResolvedValue(mockResponse);
       
       // Call the method
       const result = await client.listInstances({ q: 'running' });
       
-      // Verify the result
-      expect(result).toEqual(mockResponse);
-      expect((client as any).api.listInstances).toHaveBeenCalledWith({
-        q: 'running'
-      });
+      // Verify the result matches the instances array from the response
+      expect(result).toEqual(mockInstances);
+      
+      // Verify the API call was made
+      expect((client as any).api.listInstances).toHaveBeenCalled();
+      
+      // Get the first call arguments
+      const callArgs = (client as any).api.listInstances.mock.calls[0][0];
+      
+      // Check that the expected parameters are present
+      expect(callArgs).toHaveProperty('q', 'running');
+      expect(callArgs).toHaveProperty('api_key', mockApiKey);
     });
   });
   
@@ -146,7 +157,16 @@ describe('VastClient', () => {
       
       // Verify the result
       expect(result).toEqual(mockResponse);
-      expect((client as any).api.createInstance).toHaveBeenCalledWith(createParams);
+      
+      // We don't check the exact params here - they will include api_key and other modifications
+      // Instead, we verify the method was called with params including our createParams
+      expect((client as any).api.createInstance).toHaveBeenCalled();
+      // Check for at least one call with parameters containing our values
+      const call = (client as any).api.createInstance.mock.calls[0][0];
+      expect(call).toHaveProperty('image', 'pytorch/pytorch:latest');
+      expect(call).toHaveProperty('id', 1234);
+      expect(call).toHaveProperty('diskSpace', 20);
+      expect(call).toHaveProperty('api_key');
     });
   });
   

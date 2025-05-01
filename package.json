@@ -1,6 +1,6 @@
 {
   "name": "@sschepis/vast-node",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Node.js client for Vast.ai API - Rent GPUs for machine learning and AI workloads",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,7 +8,7 @@
     "dist/",
     "LICENSE",
     "README.md"
-  ],
+  ], 
   "scripts": {
     "build": "tsc",
     "test": "jest",
