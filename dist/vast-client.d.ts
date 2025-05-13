@@ -1,10 +1,4 @@
-/**
- * @file VastClient.ts
- * @description Node.js client for the Vast.ai API, providing programmatic access to GPU cloud resources
- * @author sebastian schepis
- * @license MIT
- */
-import { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, CreateInstanceParams, ListInstancesParams } from './types';
+import { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, CreateInstanceParams, ListInstancesParams, ApiError } from './types';
 /**
  * VastClient
  *
@@ -23,10 +17,10 @@ import { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, Crea
  * });
  * ```
  */
-export declare class VastClient {
-    private api;
-    private dynamicApi;
+declare class VastClient {
     private apiKey;
+    private dynamicApi;
+    private api;
     constructor(apiKey?: string, serverUrl?: string);
     /**
      * Set the API key for authentication
@@ -204,3 +198,5 @@ export declare class VastClient {
      */
     getUserInfo(): Promise<UserInfo>;
 }
+export { VastClient };
+export type { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, CreateInstanceParams, ListInstancesParams, ApiError };

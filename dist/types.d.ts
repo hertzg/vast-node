@@ -33,6 +33,7 @@ export interface MachineOffer {
     hostingType: string;
     directPortCount: number;
     gpuFrac?: number;
+    rentable?: boolean;
     rented?: boolean;
     hostname?: string;
     driverVersion?: string;

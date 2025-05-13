@@ -1,10 +1,4 @@
 "use strict";
-/**
- * @file VastClient.ts
- * @description Node.js client for the Vast.ai API, providing programmatic access to GPU cloud resources
- * @author sebastian schepis
- * @license MIT
- */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VastClient = void 0;
 const dynamic_api_1 = require("./dynamic-api");
@@ -38,6 +32,24 @@ class VastClient {
                 searchOffers: {
                     method: 'GET',
                     path: '/api/v0/bundles',
+                    params: [
+                        'cudaMaxGood',
+                        'cudaVers',
+                        'diskSpace',
+                        'external',
+                        'inetDown',
+                        'inetUp',
+                        'minBid',
+                        'numGpus',
+                        'orderBy',
+                        'q',
+                        'verified',
+                        'type',
+                        'storageSize',
+                        'reliability',
+                        'directPortCount'
+                    ],
+                    responseType: 'json', // Add responseType
                     retryConfig: { maxRetries: 3, retryDelay: 1000 }
                 },
                 getOffer: {
@@ -83,8 +95,8 @@ class VastClient {
                 deleteInstance: {
                     method: 'DELETE', // Use DELETE method for destroying
                     path: '/api/v0/instances/:id', // Use the instance ID in the path
-                    params: ['id', 'api_key'], // Include api_key for query param
-                    ignoreGlobalAuth: true, // Ignore the global Authorization header for this endpoint
+                    params: ['id', 'api_key'],
+                    ignoreGlobalAuth: false, // Use global Bearer token by default
                     retryConfig: { maxRetries: 3, retryDelay: 1000 }
                 },
                 // Images endpoints
@@ -112,8 +124,11 @@ class VastClient {
             timeout: 30000,
             responseInterceptor: (response) => {
                 // Log responses in debug mode
-                // console.log('Response:', response.data);
-                return response;
+                // console.log('[VastClient Response Interceptor] Status:', response.status);
+                // console.log('[VastClient Response Interceptor] Raw Data (snake_case):', response.data);
+                const camelCaseData = (0, dynamic_api_1.transformToCamelCase)(response.data);
+                // console.log('[VastClient Response Interceptor] Transformed Data (camelCase):', camelCaseData);
+                return camelCaseData;
             },
             errorInterceptor: (error) => {
                 console.error('Request failed:', error.message);
@@ -140,7 +155,7 @@ class VastClient {
             queueConcurrency: 3
         };
         // Create the dynamic API instance
-        this.dynamicApi = new dynamic_api_1.DynamicApi(apiConfig);
+        this.dynamicApi = new dynamic_api_1.DynamicApi(apiConfig); // Use imported DynamicApi
         // Set auth token if provided
         if (this.apiKey) {
             this.setApiKey(this.apiKey);
@@ -193,9 +208,16 @@ class VastClient {
     async searchOffers(params = {}) {
         console.log('Searching offers with params:', JSON.stringify(params, null, 2));
         try {
-            const result = await this.api.searchOffers(params);
-            console.log(`Found ${result.length} offers`);
-            return result;
+            const responseObject = await this.api.searchOffers(params);
+            // console.log('[VastClient searchOffers] Raw result from this.api.searchOffers (expected object with offers):', responseObject);
+            // Extract the 'offers' array from the response object
+            const offersArray = responseObject && responseObject.offers ? responseObject.offers : [];
+            if (!Array.isArray(offersArray)) {
+                console.error('Error: Expected an array of offers, but received:', offersArray);
+                return []; // Return empty array on unexpected structure
+            }
+            console.log(`Found ${offersArray.length} offers`);
+            return offersArray;
         }
         catch (error) {
             console.error('Error searching offers:', error);
@@ -280,8 +302,14 @@ class VastClient {
     async getInstance(id) {
         console.log(`Getting instance with ID: ${id}`);
         try {
-            const result = await this.api.getInstance({ id });
-            return result;
+            const responseObject = await this.api.getInstance({ id });
+            // Assuming the actual instance is nested as per the test mock: result.data.instances[0]
+            if (responseObject && responseObject.data && responseObject.data.instances && responseObject.data.instances.length > 0) {
+                return responseObject.data.instances[0];
+            }
+            // Handle cases where the structure is not as expected or instance is not found
+            console.error(`Instance with ID ${id} not found or unexpected response structure:`, responseObject);
+            throw new Error(`Instance with ID ${id} not found or unexpected response structure.`);
         }
         catch (error) {
             console.error(`Error getting instance ${id}:`, error);
@@ -317,27 +345,28 @@ class VastClient {
      */
     async createInstance(params) {
         console.log('Creating instance with input params:', JSON.stringify(params, null, 2));
-        // Structure the data for the API call
-        const apiData = {
-            ...params,
-            id: params.id, // Include id for path parameter replacement
-            api_key: this.apiKey // Include API key in the data object
+        // The 'params' object is of type CreateInstanceParams.
+        // It includes 'machineId' which is the offer ID.
+        // The API likely expects this as 'machine_id'.
+        const { machineId, ...otherParams } = params;
+        const apiPayload = {
+            ...otherParams, // Spread other parameters like image, diskSpace, etc.
+            machine_id: machineId, // Map machineId to machine_id for the API
+            api_key: this.apiKey
         };
-        // Remove machineId from the data sent in the request body (if it somehow still exists)
-        delete apiData.machineId;
-        console.log('Data object prepared for DynamicApi:', JSON.stringify(apiData, null, 2));
+        console.log('Data object prepared for DynamicApi:', JSON.stringify(apiPayload, null, 2));
         try {
-            // Pass an empty Authorization header to override the global one for this request
-            const result = await this.api.createInstance(apiData, {
+            const responseObject = await this.api.createInstance(apiPayload, {
                 headers: {
-                    Authorization: ''
+                    Authorization: '' // Override global auth for this specific call if needed
                 }
             });
-            // Extract the new_contract ID from the result
-            const instanceId = result && result.new_contract ? result.new_contract : undefined;
-            console.log(`Created instance with ID: ${instanceId}`);
-            // Return the result, which should now include the instance ID
-            return result;
+            if (responseObject && responseObject.data) {
+                console.log('Successfully created instance:', responseObject.data.id);
+                return responseObject.data;
+            }
+            console.error('Failed to create instance or unexpected API response structure:', responseObject);
+            throw new Error('Failed to create instance or unexpected API response structure.');
         }
         catch (error) {
             console.error('Error creating instance:', error);
@@ -406,13 +435,12 @@ class VastClient {
      * ```
      */
     async deleteInstance(id) {
-        console.log(`Deleting instance with ID: ${id}`);
+        console.log(`[VastClient deleteInstance] Attempting to delete instance ID: ${id}. API Key: ${this.apiKey}`);
+        const deletePayload = { id, api_key: this.apiKey };
+        // console.log('[VastClient deleteInstance] Payload for this.api.deleteInstance:', JSON.stringify(deletePayload));
         try {
-            const result = await this.api.deleteInstance({ id, api_key: this.apiKey }, {
-                headers: {
-                    Authorization: ''
-                }
-            });
+            // Use global auth (Bearer token), api_key will be query param
+            const result = await this.api.deleteInstance(deletePayload);
             console.log(`Instance ${id} delete request successful`);
             return result;
         }

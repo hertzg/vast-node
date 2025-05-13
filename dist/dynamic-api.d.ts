@@ -7,6 +7,15 @@
  */
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 /**
+ * Recursively transform all keys in an object from camelCase to snake_case
+ */
+declare function transformToSnakeCase(obj: Record<string, any> | null | undefined): Record<string, any> | null | undefined;
+/**
+ * Recursively transform all keys in an object from snake_case to camelCase
+ */
+declare function transformToCamelCase(obj: Record<string, any> | null | undefined): Record<string, any> | null | undefined;
+export { transformToSnakeCase, transformToCamelCase };
+/**
  * Supported HTTP methods
  */
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

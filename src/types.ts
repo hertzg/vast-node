@@ -34,6 +34,7 @@ export interface MachineOffer {
   hostingType: string;         // API: hosting_type
   directPortCount: number;     // API: direct_port_count
   gpuFrac?: number;            // API: gpu_frac
+  rentable?: boolean;          // API: rentable
   rented?: boolean;
   hostname?: string;
   driverVersion?: string;      // API: driver_version

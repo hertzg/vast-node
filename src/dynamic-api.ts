@@ -24,6 +24,16 @@ function camelToSnakeCase(str: string): string {
 }
 
 /**
+ * Convert a snake_case string to camelCase
+ * Example: "disk_space" -> "diskSpace"
+ */
+function snakeToCamelCase(str: string): string {
+  return str.replace(/([-_][a-z])/g, group =>
+    group.toUpperCase().replace('-', '').replace('_', '')
+  );
+}
+
+/**
  * Recursively transform all keys in an object from camelCase to snake_case
  */
 function transformToSnakeCase(
@@ -62,6 +72,49 @@ function transformToSnakeCase(
   
   return result;
 }
+
+/**
+ * Recursively transform all keys in an object from snake_case to camelCase
+ */
+function transformToCamelCase(
+  obj: Record<string, any> | null | undefined
+): Record<string, any> | null | undefined {
+  if (obj === null || obj === undefined || typeof obj !== 'object' || Array.isArray(obj)) {
+    return obj;
+  }
+
+  const result: Record<string, any> = {};
+  
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const camelCaseKey = snakeToCamelCase(key);
+      const value = obj[key];
+      
+      // Recursively transform nested objects
+      if (value !== null && typeof value === 'object') {
+        if (Array.isArray(value)) {
+          // Handle array of objects
+          result[camelCaseKey] = value.map(item =>
+            typeof item === 'object' && item !== null
+              ? transformToCamelCase(item)
+              : item
+          );
+        } else {
+          // Handle nested object
+          result[camelCaseKey] = transformToCamelCase(value);
+        }
+      } else {
+        // Handle primitive values
+        result[camelCaseKey] = value;
+      }
+    }
+  }
+  
+  return result;
+}
+
+// Export utility functions for use in other modules if needed
+export { transformToSnakeCase, transformToCamelCase };
 
 /**
  * Supported HTTP methods
@@ -269,10 +322,11 @@ export class DynamicApi {
    if (data[paramKey] !== undefined) {
     // If the parameter is for the path, replace it in the URL
     if (url.includes(`:${paramKey}`)) {
-      url = url.replace(`:${paramKey}`, encodeURIComponent(data[paramKey]));
+      url = url.replace(`:${paramKey}`, encodeURIComponent(data[paramKey] as string | number | boolean));
     } else {
-      // Otherwise, it's a query parameter
-      queryParams[paramKey] = data[paramKey];
+      // Otherwise, it's a query parameter, convert its key to snake_case
+      const snakeCaseParamKey = camelToSnakeCase(paramKey);
+      queryParams[snakeCaseParamKey] = data[paramKey];
     }
     // Delete the parameter from the original data object after processing
     delete data[paramKey];
@@ -340,8 +394,8 @@ export class DynamicApi {
 
   while (true) {
    try {
-    const response = await this.axiosInstance.request(config);
-    return response.data;
+    const response = await this.axiosInstance.request(config); // response is now the data from the interceptor
+    return response; // Return the data directly (which is response.data due to interceptor)
    } catch (error) {
     if (
      axios.isAxiosError(error) &&

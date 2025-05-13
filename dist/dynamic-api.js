@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DynamicApi = exports.RequestQueue = void 0;
+exports.DynamicApi = exports.RequestQueue = exports.transformToCamelCase = exports.transformToSnakeCase = void 0;
 const axios_1 = __importDefault(require("axios"));
 const limiter_1 = require("limiter");
 /**
@@ -24,6 +24,13 @@ const limiter_1 = require("limiter");
  */
 function camelToSnakeCase(str) {
     return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+}
+/**
+ * Convert a snake_case string to camelCase
+ * Example: "disk_space" -> "diskSpace"
+ */
+function snakeToCamelCase(str) {
+    return str.replace(/([-_][a-z])/g, group => group.toUpperCase().replace('-', '').replace('_', ''));
 }
 /**
  * Recursively transform all keys in an object from camelCase to snake_case
@@ -58,6 +65,41 @@ function transformToSnakeCase(obj) {
     }
     return result;
 }
+exports.transformToSnakeCase = transformToSnakeCase;
+/**
+ * Recursively transform all keys in an object from snake_case to camelCase
+ */
+function transformToCamelCase(obj) {
+    if (obj === null || obj === undefined || typeof obj !== 'object' || Array.isArray(obj)) {
+        return obj;
+    }
+    const result = {};
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const camelCaseKey = snakeToCamelCase(key);
+            const value = obj[key];
+            // Recursively transform nested objects
+            if (value !== null && typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    // Handle array of objects
+                    result[camelCaseKey] = value.map(item => typeof item === 'object' && item !== null
+                        ? transformToCamelCase(item)
+                        : item);
+                }
+                else {
+                    // Handle nested object
+                    result[camelCaseKey] = transformToCamelCase(value);
+                }
+            }
+            else {
+                // Handle primitive values
+                result[camelCaseKey] = value;
+            }
+        }
+    }
+    return result;
+}
+exports.transformToCamelCase = transformToCamelCase;
 /**
  * Queue that limits the number of concurrent requests
  * @internal
@@ -178,8 +220,9 @@ class DynamicApi {
                     url = url.replace(`:${paramKey}`, encodeURIComponent(data[paramKey]));
                 }
                 else {
-                    // Otherwise, it's a query parameter
-                    queryParams[paramKey] = data[paramKey];
+                    // Otherwise, it's a query parameter, convert its key to snake_case
+                    const snakeCaseParamKey = camelToSnakeCase(paramKey);
+                    queryParams[snakeCaseParamKey] = data[paramKey];
                 }
                 // Delete the parameter from the original data object after processing
                 delete data[paramKey];
@@ -232,8 +275,8 @@ class DynamicApi {
         let retries = 0;
         while (true) {
             try {
-                const response = await this.axiosInstance.request(config);
-                return response.data;
+                const response = await this.axiosInstance.request(config); // response is now the data from the interceptor
+                return response; // Return the data directly (which is response.data due to interceptor)
             }
             catch (error) {
                 if (axios_1.default.isAxiosError(error) &&
