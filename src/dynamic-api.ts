@@ -6,8 +6,8 @@
  * @license MIT
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { RateLimiter } from 'limiter';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'npm:axios';
+import { RateLimiter } from 'npm:limiter';
 
 /**
  * Utility functions for parameter name transformation
@@ -343,7 +343,7 @@ export class DynamicApi {
 
   // Remove Authorization header if ignoreGlobalAuth is true for this endpoint
   if (endpoint.ignoreGlobalAuth && axiosConfig.headers) {
-    console.log('Ignoring global Authorization header for this endpoint.');
+    //console.log('Ignoring global Authorization header for this endpoint.');
     delete axiosConfig.headers['Authorization'];
   }
 
@@ -359,13 +359,13 @@ export class DynamicApi {
   axiosConfig.params = queryParams;
 
 
-  console.log('Request config before sending:', {
-    method: axiosConfig.method,
-    url: axiosConfig.url,
-    headers: axiosConfig.headers,
-    params: axiosConfig.params,
-    data: axiosConfig.data,
-  });
+  // console.log('Request config before sending:', {
+  //   method: axiosConfig.method,
+  //   url: axiosConfig.url,
+  //   headers: axiosConfig.headers,
+  //   params: axiosConfig.params,
+  //   data: axiosConfig.data,
+  // });
 
 
   const finalRetryConfig: RetryConfig = {

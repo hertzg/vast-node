@@ -3,7 +3,7 @@
  * @description Diagnostic utilities for troubleshooting Vast.ai SDK issues
  */
 
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'npm:axios';
 
 // Log levels
 export enum LogLevel {
