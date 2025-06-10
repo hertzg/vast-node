@@ -375,6 +375,8 @@ class VastClient {
             if (responseObject && responseObject.data) {
                 //console.log('Successfully created instance:', responseObject.data.id);
                 return responseObject.data as Instance;
+            } else if(responseObject.success && responseObject.newContract != null) {
+                return await this.getInstance(responseObject.newContract);
             }
             
             console.error('Failed to create instance or unexpected API response structure:', responseObject);
