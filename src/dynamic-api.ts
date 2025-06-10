@@ -6,8 +6,8 @@
  * @license MIT
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'npm:axios';
-import { RateLimiter } from 'npm:limiter';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'npm:axios@^1.6.2';
+import { RateLimiter } from 'npm:limiter@^2.1.0';
 
 /**
  * Utility functions for parameter name transformation
