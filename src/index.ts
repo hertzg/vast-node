@@ -4,7 +4,7 @@
  */
 
 // Export the main client class
-export { VastClient } from './vast-client';
+export { VastClient } from './vast-client.ts';
 
 // Export types for TypeScript users
 export {

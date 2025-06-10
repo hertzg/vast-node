@@ -1,5 +1,5 @@
-import { DynamicApi, ApiConfig, transformToCamelCase } from "./dynamic-api";
-import { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, CreateInstanceParams, ListInstancesParams, ApiError } from './types';
+import { DynamicApi, ApiConfig, transformToCamelCase } from "./dynamic-api.ts";
+import type { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, CreateInstanceParams, ListInstancesParams, ApiError } from './types.ts';
 import { AxiosResponse, AxiosError } from 'npm:axios';
 
 /**
