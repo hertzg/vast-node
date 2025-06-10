@@ -88,6 +88,11 @@ export interface Instance {
     hostname: string;
     geolocation: string;
   };
+  publicIpaddr?: string;       // API: public_ipaddr
+  ports?: Record<string, {     // API: ports
+    HostIp: string, 
+    HostPort: string}[]
+  >; 
   rentable?: boolean;
 }
 
