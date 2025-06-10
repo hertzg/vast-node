@@ -16,7 +16,7 @@ export {
   CreateInstanceParams,
   ListInstancesParams,
   ApiError
-} from './types';
+} from './types.ts';
 
 // Export the DynamicApi class for advanced usage scenarios
-export { DynamicApi, ApiConfig, EndpointConfig } from './dynamic-api';
+export { DynamicApi, ApiConfig, EndpointConfig } from './dynamic-api.ts';
