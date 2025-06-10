@@ -210,7 +210,7 @@ class VastClient {
      * ```
      */
     async searchOffers(params: SearchOffersParams = {}): Promise<MachineOffer[]> {
-        console.log('Searching offers with params:', JSON.stringify(params, null, 2));
+        //console.log('Searching offers with params:', JSON.stringify(params, null, 2));
         try {
             const responseObject = await this.api.searchOffers(params);
             // console.log('[VastClient searchOffers] Raw result from this.api.searchOffers (expected object with offers):', responseObject);
@@ -223,7 +223,7 @@ class VastClient {
                 return []; // Return empty array on unexpected structure
             }
             
-            console.log(`Found ${offersArray.length} offers`);
+            //console.log(`Found ${offersArray.length} offers`);
             return offersArray;
         }
         catch (error) {
@@ -243,7 +243,7 @@ class VastClient {
      * ```
      */
     async getOffer(id: number): Promise<MachineOffer> {
-        console.log(`Getting offer with ID: ${id}`);
+        //console.log(`Getting offer with ID: ${id}`);
         try {
             const result = await this.api.getOffer({ id });
             return result;
@@ -271,7 +271,7 @@ class VastClient {
      * ```
      */
     async listInstances(params: ListInstancesParams = {}): Promise<Instance[]> {
-        console.log('Listing instances with params:', JSON.stringify(params, null, 2));
+        //console.log('Listing instances with params:', JSON.stringify(params, null, 2));
         // Include api_key in params for this specific endpoint
         const paramsWithApiKey = {
             ...params,
@@ -284,10 +284,10 @@ class VastClient {
                     Authorization: ''
                 }
             });
-            console.log('Raw listInstances result:', JSON.stringify(result, null, 2)); // Log raw result
+            //console.log('Raw listInstances result:', JSON.stringify(result, null, 2)); // Log raw result
             // The API returns an object with an 'instances' key containing the array
             const instances = result && result.instances ? result.instances : [];
-            console.log(`Found ${instances.length} instances`);
+            //console.log(`Found ${instances.length} instances`);
             return instances; // Return the array of instances
         }
         catch (error) {
@@ -307,7 +307,7 @@ class VastClient {
      * ```
      */
     async getInstance(id: number): Promise<Instance> {
-        console.log(`Getting instance with ID: ${id}`);
+        //console.log(`Getting instance with ID: ${id}`);
         try {
             const responseObject = await this.api.getInstance({ id });
             // Assuming the actual instance is nested as per the test mock: result.data.instances[0]
@@ -351,7 +351,7 @@ class VastClient {
      * ```
      */
     async createInstance(params: CreateInstanceParams): Promise<Instance> {
-        console.log('Creating instance with input params:', JSON.stringify(params, null, 2));
+        //console.log('Creating instance with input params:', JSON.stringify(params, null, 2));
         
         // The 'params' object is of type CreateInstanceParams.
         // It includes 'machineId' which is the offer ID.
@@ -364,7 +364,7 @@ class VastClient {
             api_key: this.apiKey
         };
 
-        console.log('Data object prepared for DynamicApi:', JSON.stringify(apiPayload, null, 2));
+        //console.log('Data object prepared for DynamicApi:', JSON.stringify(apiPayload, null, 2));
         try {
             const responseObject = await this.api.createInstance(apiPayload, {
                 headers: {
@@ -373,7 +373,7 @@ class VastClient {
             });
 
             if (responseObject && responseObject.data) {
-                console.log('Successfully created instance:', responseObject.data.id);
+                //console.log('Successfully created instance:', responseObject.data.id);
                 return responseObject.data as Instance;
             }
             
@@ -397,10 +397,10 @@ class VastClient {
      * ```
      */
     async startInstance(id: number): Promise<any> {
-        console.log(`Starting instance with ID: ${id}`);
+        //console.log(`Starting instance with ID: ${id}`);
         try {
             const result = await this.api.startInstance({ id });
-            console.log(`Instance ${id} start request successful`);
+            //console.log(`Instance ${id} start request successful`);
             return result;
         }
         catch (error) {
@@ -420,14 +420,14 @@ class VastClient {
      * ```
      */
     async stopInstance(id: number): Promise<any> {
-        console.log(`Stopping instance with ID: ${id}`);
+        //console.log(`Stopping instance with ID: ${id}`);
         try {
             const result = await this.api.stopInstance({ id, api_key: this.apiKey }, {
                 headers: {
                     Authorization: ''
                 }
             });
-            console.log(`Instance ${id} stop request successful`);
+            //console.log(`Instance ${id} stop request successful`);
             return result;
         }
         catch (error) {
@@ -447,13 +447,13 @@ class VastClient {
      * ```
      */
     async deleteInstance(id: number): Promise<any> {
-        console.log(`[VastClient deleteInstance] Attempting to delete instance ID: ${id}. API Key: ${this.apiKey}`);
+        //console.log(`[VastClient deleteInstance] Attempting to delete instance ID: ${id}. API Key: ${this.apiKey}`);
         const deletePayload = { id, api_key: this.apiKey };
         // console.log('[VastClient deleteInstance] Payload for this.api.deleteInstance:', JSON.stringify(deletePayload));
         try {
             // Use global auth (Bearer token), api_key will be query param
             const result = await this.api.deleteInstance(deletePayload);
-            console.log(`Instance ${id} delete request successful`);
+            //console.log(`Instance ${id} delete request successful`);
             return result;
         }
         catch (error) {
@@ -478,10 +478,10 @@ class VastClient {
      * ```
      */
     async listImages(params: { api_key?: string } = {}): Promise<DockerImage[]> {
-        console.log('Listing available Docker images with params:', JSON.stringify(params, null, 2));
+        //console.log('Listing available Docker images with params:', JSON.stringify(params, null, 2));
         try {
             const result = await this.api.listImages(params);
-            console.log(`Found ${result.length} Docker images`);
+            //console.log(`Found ${result.length} Docker images`);
             return result;
         }
         catch (error) {
@@ -501,10 +501,10 @@ class VastClient {
      * ```
      */
     async getUserInfo(): Promise<UserInfo> {
-        console.log('Getting user information');
+        //console.log('Getting user information');
         try {
             const result = await this.api.getUserInfo();
-            console.log(`Got user info for: ${result.username}`);
+            //console.log(`Got user info for: ${result.username}`);
             return result;
         }
         catch (error) {
