@@ -14,6 +14,7 @@ export type {
   UserInfo,
   SearchOffersParams,
   CreateInstanceParams,
+  CreateInstanceResponse,
   ListInstancesParams,
   ApiError
 } from './types.ts';

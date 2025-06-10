@@ -1,5 +1,5 @@
 import { DynamicApi, ApiConfig, transformToCamelCase } from "./dynamic-api.ts";
-import type { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, CreateInstanceParams, ListInstancesParams, ApiError } from './types.ts';
+import type { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, CreateInstanceParams, CreateInstanceResponse, ListInstancesParams, ApiError } from './types.ts';
 import { AxiosResponse, AxiosError } from 'npm:axios@^1.6.2';
 
 /**
@@ -214,7 +214,7 @@ class VastClient {
         try {
             const responseObject = await this.api.searchOffers(params);
             // console.log('[VastClient searchOffers] Raw result from this.api.searchOffers (expected object with offers):', responseObject);
-            
+
             // Extract the 'offers' array from the response object
             const offersArray = responseObject && responseObject.offers ? responseObject.offers : [];
 
@@ -222,7 +222,7 @@ class VastClient {
                 console.error('Error: Expected an array of offers, but received:', offersArray);
                 return []; // Return empty array on unexpected structure
             }
-            
+
             //console.log(`Found ${offersArray.length} offers`);
             return offersArray;
         }
@@ -350,9 +350,9 @@ class VastClient {
      * });
      * ```
      */
-    async createInstance(params: CreateInstanceParams): Promise<Instance> {
+    async createInstance(params: CreateInstanceParams): Promise<CreateInstanceResponse> {
         //console.log('Creating instance with input params:', JSON.stringify(params, null, 2));
-        
+
         // The 'params' object is of type CreateInstanceParams.
         // It includes 'machineId' which is the offer ID.
         // The API likely expects this as 'machine_id'.
@@ -372,13 +372,10 @@ class VastClient {
                 }
             });
 
-            if (responseObject && responseObject.data) {
-                //console.log('Successfully created instance:', responseObject.data.id);
-                return responseObject.data as Instance;
-            } else if(responseObject.success && responseObject.newContract != null) {
-                return await this.api.getInstance(responseObject.newContract);
+            if (responseObject.success && responseObject.newContract != null) {
+                return responseObject;
             }
-            
+
             console.error('Failed to create instance or unexpected API response structure:', responseObject);
             throw new Error('Failed to create instance or unexpected API response structure.');
         }

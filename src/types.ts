@@ -90,9 +90,10 @@ export interface Instance {
   };
   publicIpaddr?: string;       // API: public_ipaddr
   ports?: Record<string, {     // API: ports
-    HostIp: string, 
-    HostPort: string}[]
-  >; 
+    HostIp: string,
+    HostPort: string
+  }[]
+  >;
   rentable?: boolean;
 }
 
@@ -172,6 +173,14 @@ export interface CreateInstanceParams {
   runCommand?: string;
   env?: Record<string, string>;
   [key: string]: any; // Allow other properties
+}
+
+/**
+ * API response for createInstance
+ */
+export interface CreateInstanceResponse {
+  success: boolean;
+  newContract: number;
 }
 
 /**
