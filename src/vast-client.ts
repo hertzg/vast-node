@@ -311,8 +311,8 @@ class VastClient {
         try {
             const responseObject = await this.api.getInstance({ id });
             // Assuming the actual instance is nested as per the test mock: result.data.instances[0]
-            if (responseObject && responseObject.data && responseObject.data.instances && responseObject.data.instances.length > 0) {
-                return responseObject.data.instances[0];
+            if (responseObject && responseObject.instances && responseObject.instances) {
+                return responseObject.instances as Instance;
             }
             // Handle cases where the structure is not as expected or instance is not found
             console.error(`Instance with ID ${id} not found or unexpected response structure:`, responseObject);
@@ -376,7 +376,7 @@ class VastClient {
                 //console.log('Successfully created instance:', responseObject.data.id);
                 return responseObject.data as Instance;
             } else if(responseObject.success && responseObject.newContract != null) {
-                return await this.getInstance(responseObject.newContract);
+                return await this.api.getInstance(responseObject.newContract);
             }
             
             console.error('Failed to create instance or unexpected API response structure:', responseObject);
