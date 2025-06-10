@@ -9,5 +9,9 @@
       "README.md",
       "./src/*.ts"
     ]
+  },
+  "imports": {
+    "axios": "npm:axios@^1.9.0",
+    "limiter": "npm:limiter@^2.1.0"
   }
 }

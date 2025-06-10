@@ -3,7 +3,8 @@
  * @description Diagnostic utilities for troubleshooting Vast.ai SDK issues
  */
 
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'npm:axios@^1.6.2';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import process from "node:process";
 
 // Log levels
 export enum LogLevel {
@@ -12,7 +13,7 @@ export enum LogLevel {
   WARN = 2,
   INFO = 3,
   DEBUG = 4,
-  TRACE = 5
+  TRACE = 5,
 }
 
 // Diagnostic configuration
@@ -30,7 +31,7 @@ const DEFAULT_CONFIG: DiagnosticConfig = {
   logRequests: false,
   logResponses: false,
   logErrors: true,
-  redactSensitiveData: true
+  redactSensitiveData: true,
 };
 
 // Global diagnostic state
@@ -42,15 +43,20 @@ let currentConfig: DiagnosticConfig = { ...DEFAULT_CONFIG };
  */
 export function configureDiagnostics(config: Partial<DiagnosticConfig>): void {
   currentConfig = { ...currentConfig, ...config };
-  
+
   // Log configuration change
   if (currentConfig.logLevel >= LogLevel.INFO) {
-    console.log('[Vast SDK] Diagnostics configured:', 
-      JSON.stringify({
-        ...currentConfig,
-        // Don't log actual log level number, show the name instead
-        logLevel: LogLevel[currentConfig.logLevel]
-      }, null, 2)
+    console.log(
+      "[Vast SDK] Diagnostics configured:",
+      JSON.stringify(
+        {
+          ...currentConfig,
+          // Don't log actual log level number, show the name instead
+          logLevel: LogLevel[currentConfig.logLevel],
+        },
+        null,
+        2,
+      ),
     );
   }
 }
@@ -68,7 +74,7 @@ export function getDiagnosticConfig(): DiagnosticConfig {
 export function resetDiagnostics(): void {
   currentConfig = { ...DEFAULT_CONFIG };
   if (currentConfig.logLevel >= LogLevel.INFO) {
-    console.log('[Vast SDK] Diagnostics reset to defaults');
+    console.log("[Vast SDK] Diagnostics reset to defaults");
   }
 }
 
@@ -85,30 +91,33 @@ export function isLoggingEnabled(level: LogLevel): boolean {
  * @param data The data to redact
  * @param sensitiveKeys Keys to redact
  */
-export function redactSensitiveData<T>(data: T, sensitiveKeys: string[] = ['api_key', 'Authorization', 'token', 'password']): T {
+export function redactSensitiveData<T>(
+  data: T,
+  sensitiveKeys: string[] = ["api_key", "Authorization", "token", "password"],
+): T {
   if (!currentConfig.redactSensitiveData) return data;
-  if (!data || typeof data !== 'object') return data;
-  
+  if (!data || typeof data !== "object") return data;
+
   const result = { ...data as any };
-  
+
   // Recursively process object
   for (const key in result) {
     if (sensitiveKeys.includes(key)) {
       const value = result[key];
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         // Redact string values but keep a hint of the original
         const firstChars = value.substring(0, 3);
         const lastChars = value.substring(value.length - 3);
         result[key] = `${firstChars}...${lastChars}`;
       } else {
-        result[key] = '[REDACTED]';
+        result[key] = "[REDACTED]";
       }
-    } else if (typeof result[key] === 'object' && result[key] !== null) {
+    } else if (typeof result[key] === "object" && result[key] !== null) {
       // Recursively redact nested objects
       result[key] = redactSensitiveData(result[key], sensitiveKeys);
     }
   }
-  
+
   return result as T;
 }
 
@@ -118,24 +127,32 @@ export function redactSensitiveData<T>(data: T, sensitiveKeys: string[] = ['api_
 export function createRequestInterceptor() {
   return (config: AxiosRequestConfig) => {
     if (currentConfig.logRequests && isLoggingEnabled(LogLevel.DEBUG)) {
-      console.log(`[Vast SDK] Request: ${config.method?.toUpperCase()} ${config.url}`);
-      
+      console.log(
+        `[Vast SDK] Request: ${config.method?.toUpperCase()} ${config.url}`,
+      );
+
       // Log headers with sensitive data redacted
       if (config.headers && isLoggingEnabled(LogLevel.TRACE)) {
-        console.log('[Vast SDK] Headers:', redactSensitiveData(config.headers));
+        console.log("[Vast SDK] Headers:", redactSensitiveData(config.headers));
       }
-      
+
       // Log request data
       if ((config.data || config.params) && isLoggingEnabled(LogLevel.TRACE)) {
         if (config.data) {
-          console.log('[Vast SDK] Request Data:', redactSensitiveData(config.data));
+          console.log(
+            "[Vast SDK] Request Data:",
+            redactSensitiveData(config.data),
+          );
         }
         if (config.params) {
-          console.log('[Vast SDK] Request Params:', redactSensitiveData(config.params));
+          console.log(
+            "[Vast SDK] Request Params:",
+            redactSensitiveData(config.params),
+          );
         }
       }
     }
-    
+
     return config;
   };
 }
@@ -146,14 +163,19 @@ export function createRequestInterceptor() {
 export function createResponseInterceptor() {
   return (response: AxiosResponse) => {
     if (currentConfig.logResponses && isLoggingEnabled(LogLevel.DEBUG)) {
-      console.log(`[Vast SDK] Response: ${response.status} ${response.statusText} from ${response.config.method?.toUpperCase()} ${response.config.url}`);
-      
+      console.log(
+        `[Vast SDK] Response: ${response.status} ${response.statusText} from ${response.config.method?.toUpperCase()} ${response.config.url}`,
+      );
+
       // Log response data
       if (response.data && isLoggingEnabled(LogLevel.TRACE)) {
-        console.log('[Vast SDK] Response Data:', redactSensitiveData(response.data));
+        console.log(
+          "[Vast SDK] Response Data:",
+          redactSensitiveData(response.data),
+        );
       }
     }
-    
+
     return response;
   };
 }
@@ -165,36 +187,48 @@ export function createErrorInterceptor() {
   return (error: AxiosError) => {
     if (currentConfig.logErrors && isLoggingEnabled(LogLevel.ERROR)) {
       if (error.response) {
-        console.error(`[Vast SDK] Error: ${error.response.status} ${error.response.statusText} from ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
-        
+        console.error(
+          `[Vast SDK] Error: ${error.response.status} ${error.response.statusText} from ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
+        );
+
         // Check for authentication errors
         if (error.response.status === 401) {
-          console.error('[Vast SDK] Authentication Error: Please check your API key');
+          console.error(
+            "[Vast SDK] Authentication Error: Please check your API key",
+          );
         }
-        
+
         // Log error response data
         if (error.response.data && isLoggingEnabled(LogLevel.DEBUG)) {
-          console.error('[Vast SDK] Error Data:', redactSensitiveData(error.response.data));
+          console.error(
+            "[Vast SDK] Error Data:",
+            redactSensitiveData(error.response.data),
+          );
         }
       } else if (error.request) {
-        console.error(`[Vast SDK] Network Error: No response received for ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
-        console.error('[Vast SDK] Request Details:', error.request);
+        console.error(
+          `[Vast SDK] Network Error: No response received for ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
+        );
+        console.error("[Vast SDK] Request Details:", error.request);
       } else {
         console.error(`[Vast SDK] Error: ${error.message}`);
       }
-      
+
       // Log request that caused the error
       if (error.config && isLoggingEnabled(LogLevel.DEBUG)) {
-        console.error('[Vast SDK] Failed Request Config:', redactSensitiveData({
-          method: error.config.method?.toUpperCase(),
-          url: error.config.url,
-          headers: error.config.headers,
-          data: error.config.data,
-          params: error.config.params
-        }));
+        console.error(
+          "[Vast SDK] Failed Request Config:",
+          redactSensitiveData({
+            method: error.config.method?.toUpperCase(),
+            url: error.config.url,
+            headers: error.config.headers,
+            data: error.config.data,
+            params: error.config.params,
+          }),
+        );
       }
     }
-    
+
     return Promise.reject(error);
   };
 }
@@ -204,11 +238,11 @@ export function createErrorInterceptor() {
  */
 export function createDiagnosticInfo() {
   return {
-    sdkVersion: '0.1.0',
+    sdkVersion: "0.1.0",
     platform: process.platform,
     nodeVersion: process.version,
     timestamp: new Date().toISOString(),
-    config: redactSensitiveData(currentConfig)
+    config: redactSensitiveData(currentConfig),
   };
 }
 
@@ -218,10 +252,16 @@ export function createDiagnosticInfo() {
  * @param actualData The actual data received
  * @param path The path where the mismatch occurred
  */
-export function logSchemaMismatch(expectedType: string, actualData: any, path: string = 'root'): void {
+export function logSchemaMismatch(
+  expectedType: string,
+  actualData: any,
+  path: string = "root",
+): void {
   if (isLoggingEnabled(LogLevel.WARN)) {
-    console.warn(`[Vast SDK] Schema mismatch at ${path}: Expected type ${expectedType} but received:`, 
-      redactSensitiveData(actualData));
+    console.warn(
+      `[Vast SDK] Schema mismatch at ${path}: Expected type ${expectedType} but received:`,
+      redactSensitiveData(actualData),
+    );
   }
 }
 
@@ -231,18 +271,32 @@ export function logSchemaMismatch(expectedType: string, actualData: any, path: s
  * @param expectedKeys The expected keys
  * @param typeName The name of the type for logging
  */
-export function validateSchema(data: any, expectedKeys: string[], typeName: string): void {
-  if (!isLoggingEnabled(LogLevel.WARN) || !data || typeof data !== 'object') return;
-  
-  // Check for missing expected keys
-  const missingKeys = expectedKeys.filter(key => data[key] === undefined);
-  if (missingKeys.length > 0) {
-    console.warn(`[Vast SDK] Schema validation: ${typeName} missing expected keys:`, missingKeys);
+export function validateSchema(
+  data: any,
+  expectedKeys: string[],
+  typeName: string,
+): void {
+  if (!isLoggingEnabled(LogLevel.WARN) || !data || typeof data !== "object") {
+    return;
   }
-  
+
+  // Check for missing expected keys
+  const missingKeys = expectedKeys.filter((key) => data[key] === undefined);
+  if (missingKeys.length > 0) {
+    console.warn(
+      `[Vast SDK] Schema validation: ${typeName} missing expected keys:`,
+      missingKeys,
+    );
+  }
+
   // Check for unexpected keys
-  const extraKeys = Object.keys(data).filter(key => !expectedKeys.includes(key));
+  const extraKeys = Object.keys(data).filter((key) =>
+    !expectedKeys.includes(key)
+  );
   if (extraKeys.length > 0 && isLoggingEnabled(LogLevel.DEBUG)) {
-    console.debug(`[Vast SDK] Schema validation: ${typeName} has additional keys:`, extraKeys);
+    console.debug(
+      `[Vast SDK] Schema validation: ${typeName} has additional keys:`,
+      extraKeys,
+    );
   }
 }

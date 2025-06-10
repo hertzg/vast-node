@@ -4,21 +4,21 @@
  */
 
 // Export the main client class
-export { VastClient } from './vast-client.ts';
+export { VastClient } from "./vast-client.ts";
 
 // Export types for TypeScript users
 export type {
-  MachineOffer,
-  Instance,
-  DockerImage,
-  UserInfo,
-  SearchOffersParams,
+  ApiError,
   CreateInstanceParams,
   CreateInstanceResponse,
+  DockerImage,
+  Instance,
   ListInstancesParams,
-  ApiError
-} from './types.ts';
+  MachineOffer,
+  SearchOffersParams,
+  UserInfo,
+} from "./types.ts";
 
 // Export the DynamicApi class for advanced usage scenarios
-export type { ApiConfig, EndpointConfig } from './dynamic-api.ts';
-export { DynamicApi } from './dynamic-api.ts'
+export { DynamicApi } from "./dynamic-api.ts";
+export type { ApiConfig, EndpointConfig } from "./dynamic-api.ts";

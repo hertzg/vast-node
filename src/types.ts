@@ -11,34 +11,34 @@
  */
 export interface MachineOffer {
   id: number;
-  cudaMaxGood: number;         // API: cuda_max_good
-  numGpus: number;             // API: num_gpus
-  gpuName: string;             // API: gpu_name
-  gpuRam: number;              // API: gpu_ram
-  diskSpace: number;           // API: disk_space
-  cpuRam: number;              // API: cpu_ram
-  cpuCores: number;            // API: cpu_cores
+  cudaMaxGood: number;
+  numGpus: number;
+  gpuName: string;
+  gpuRam: number;
+  diskSpace: number;
+  cpuRam: number;
+  cpuCores: number;
   reliability: number;
   dlperf: number;
-  dlperfPerDphtotal: number;   // API: dlperf_per_dphtotal
-  inetUp: number;              // API: inet_up
-  inetDown: number;            // API: inet_down
+  dlperfPerDphtotal: number;
+  inetUp: number;
+  inetDown: number;
   verification: string;
-  dphTotal: number;            // API: dph_total
-  minBid: number;              // API: min_bid
+  dphTotal: number;
+  minBid: number;
   datacenter: {
     id: number;
     geolocation: string;
   };
   external: boolean;
-  hostingType: string;         // API: hosting_type
-  directPortCount: number;     // API: direct_port_count
-  gpuFrac?: number;            // API: gpu_frac
-  rentable?: boolean;          // API: rentable
+  hostingType: string;
+  directPortCount: number;
+  gpuFrac?: number;
+  rentable?: boolean;
   rented?: boolean;
   hostname?: string;
-  driverVersion?: string;      // API: driver_version
-  cudaVersion?: string;        // API: cuda_version
+  driverVersion?: string;
+  cudaVersion?: string;
 }
 
 /**
@@ -49,51 +49,47 @@ export interface MachineOffer {
  */
 export interface Instance {
   id: number;
-  machineId: number;           // API: machine_id
-  actualStatus: string;        // API: actual_status
-  curState: string;            // API: cur_state
-  nextState?: string;          // API: next_state
-  imageUuid: string;           // API: image_uuid
-  imageRuntype: string;        // API: image_runtype
-  imageArgs?: string;          // API: image_args
+  machineId: number;
+  actualStatus: string;
+  curState: string;
+  nextState?: string;
+  imageUuid: string;
+  imageRuntype: string;
+  imageArgs?: string;
   env?: Record<string, string>;
-  extraEnv?: Record<string, string>; // API: extra_env
-  diskUsage?: number;          // API: disk_usage
-  diskSpace?: number;          // API: disk_space
-  sshPort?: number;            // API: ssh_port
-  sshIdx?: number;             // API: ssh_idx
-  sshHost?: string;            // API: ssh_host
-  sshKeyId?: number;           // API: ssh_key_id
-  sshProxyCommand?: string;    // API: ssh_proxy_command
-  intendedStatus: string;      // API: intended_status
-  startDate?: string;          // API: start_date
-  endDate?: string;            // API: end_date
-  jupyterToken?: string;       // API: jupyter_token
-  jupyterUrl?: string;         // API: jupyter_url
-  statusMsg?: string;          // API: status_msg
+  extraEnv?: Record<string, string>;
+  diskUsage?: number;
+  diskSpace?: number;
+  sshPort?: number;
+  sshIdx?: number;
+  sshHost?: string;
+  sshKeyId?: number;
+  sshProxyCommand?: string;
+  intendedStatus: string;
+  startDate?: string;
+  endDate?: string;
+  jupyterToken?: string;
+  jupyterUrl?: string;
+  statusMsg?: string;
   hostname?: string;
-  gpuCt?: number;              // API: gpu_ct
-  gpuName?: string;            // API: gpu_name
-  gpuMem?: number;             // API: gpu_mem
-  cpuCores?: number;           // API: cpu_cores
-  cpuMem?: number;             // API: cpu_mem
-  inetUp: number;              // API: inet_up
-  inetDown: number;            // API: inet_down
-  pricePerHour?: number;       // API: price_per_hour
-  costPerHour?: number;        // API: cost_per_hour
-  minBid?: number;             // API: min_bid
-  numGpus?: number;            // API: num_gpus
+  gpuCt?: number;
+  gpuName?: string;
+  gpuMem?: number;
+  cpuCores?: number;
+  cpuMem?: number;
+  inetUp: number;
+  inetDown: number;
+  pricePerHour?: number;
+  costPerHour?: number;
+  minBid?: number;
+  numGpus?: number;
   machine?: {
     id: number;
     hostname: string;
     geolocation: string;
   };
-  publicIpaddr?: string;       // API: public_ipaddr
-  ports?: Record<string, {     // API: ports
-    HostIp: string,
-    HostPort: string
-  }[]
-  >;
+  publicIpaddr?: string;
+  ports?: Record<string, { HostIp: string; HostPort: string }[]>;
   rentable?: boolean;
 }
 
@@ -144,21 +140,21 @@ export interface UserInfo {
  * Parameters for searching machine offers
  */
 export interface SearchOffersParams {
-  cudaMaxGood?: number;      // API: cuda_max_good
-  cudaVers?: number;         // API: cuda_vers
-  diskSpace?: number;        // API: disk_space
+  cudaMaxGood?: number;
+  cudaVers?: number;
+  diskSpace?: number;
   external?: boolean;
-  inetDown?: number;         // API: inet_down
-  inetUp?: number;           // API: inet_up
-  minBid?: number;           // API: min_bid
-  numGpus?: number;          // API: num_gpus
-  orderBy?: string;          // API: order
+  inetDown?: number;
+  inetUp?: number;
+  minBid?: number;
+  numGpus?: number;
+  orderBy?: string;
   q?: string;
   verified?: boolean;
   type?: string;
-  storageSize?: number;      // API: storage_size
+  storageSize?: number;
   reliability?: number;
-  directPortCount?: number;  // API: direct_port_count
+  directPortCount?: number;
 }
 
 /**
@@ -172,7 +168,7 @@ export interface CreateInstanceParams {
   sshKeyIds?: number[];
   runCommand?: string;
   env?: Record<string, string>;
-  [key: string]: any; // Allow other properties
+  [key: string]: any;
 }
 
 /**
