@@ -259,7 +259,12 @@ export class DynamicApi {
   * @template T - The type of endpoints configuration
   * @returns An object with methods corresponding to each endpoint
   */
- createApiMethods<T extends Record<string, EndpointConfig>>() {
+ createApiMethods<T extends Record<string, EndpointConfig>>() : {
+   [K in keyof T]: (
+    data?: Record<string, any>,
+    config?: AxiosRequestConfig
+   ) => ApiResponse<any>
+  } {
   const api: Record<string, Function> = {};
 
   for (const [name, endpoint] of Object.entries(this.config.endpoints)) {
