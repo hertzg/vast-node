@@ -1,6 +1,6 @@
 import { DynamicApi, ApiConfig, transformToCamelCase } from "./dynamic-api";
 import { MachineOffer, Instance, DockerImage, UserInfo, SearchOffersParams, CreateInstanceParams, ListInstancesParams, ApiError } from './types';
-import { AxiosResponse, AxiosError } from 'axios';
+import { AxiosResponse, AxiosError } from 'npm:axios';
 
 /**
  * VastClient
