@@ -232,17 +232,17 @@ class VastClient {
         : [];
 
       if (!Array.isArray(offersArray)) {
-        console.error(
-          "Error: Expected an array of offers, but received:",
-          offersArray,
-        );
+        // console.error(
+        //   "Error: Expected an array of offers, but received:",
+        //   offersArray,
+        // );
         return []; // Return empty array on unexpected structure
       }
 
       //console.log(`Found ${offersArray.length} offers`);
       return offersArray;
     } catch (error) {
-      console.error("Error searching offers:", error);
+      // console.error("Error searching offers:", error);
       throw error;
     }
   }
@@ -263,7 +263,7 @@ class VastClient {
       const result = await this.api.getOffer({ id });
       return result;
     } catch (error) {
-      console.error(`Error getting offer ${id}:`, error);
+      // console.error(`Error getting offer ${id}:`, error);
       throw error;
     }
   }
@@ -304,7 +304,7 @@ class VastClient {
       //console.log(`Found ${instances.length} instances`);
       return instances; // Return the array of instances
     } catch (error) {
-      console.error("Error listing instances:", error);
+      // console.error("Error listing instances:", error);
       throw error;
     }
   }
@@ -332,15 +332,15 @@ class VastClient {
         return responseObject.instances as Instance;
       }
       // Handle cases where the structure is not as expected or instance is not found
-      console.error(
-        `Instance with ID ${id} not found or unexpected response structure:`,
-        responseObject,
-      );
+      // console.error(
+      //   `Instance with ID ${id} not found or unexpected response structure:`,
+      //   responseObject,
+      // );
       throw new Error(
         `Instance with ID ${id} not found or unexpected response structure.`,
       );
     } catch (error) {
-      console.error(`Error getting instance ${id}:`, error);
+      //console.error(`Error getting instance ${id}:`, error);
       throw error;
     }
   }
@@ -399,15 +399,15 @@ class VastClient {
         return responseObject;
       }
 
-      console.error(
-        "Failed to create instance or unexpected API response structure:",
-        responseObject,
-      );
+      // console.error(
+      //   "Failed to create instance or unexpected API response structure:",
+      //   responseObject,
+      // );
       throw new Error(
         "Failed to create instance or unexpected API response structure.",
       );
     } catch (error) {
-      console.error("Error creating instance:", error);
+      // console.error("Error creating instance:", error);
       throw error;
     }
   }
@@ -429,7 +429,7 @@ class VastClient {
       //console.log(`Instance ${id} start request successful`);
       return result;
     } catch (error) {
-      console.error(`Error starting instance ${id}:`, error);
+      // console.error(`Error starting instance ${id}:`, error);
       throw error;
     }
   }
@@ -458,7 +458,7 @@ class VastClient {
       //console.log(`Instance ${id} stop request successful`);
       return result;
     } catch (error) {
-      console.error(`Error stopping instance ${id}:`, error);
+      // console.error(`Error stopping instance ${id}:`, error);
       throw error;
     }
   }
@@ -483,7 +483,7 @@ class VastClient {
       //console.log(`Instance ${id} delete request successful`);
       return result;
     } catch (error) {
-      console.error(`Error deleting instance ${id}:`, error);
+      // console.error(`Error deleting instance ${id}:`, error);
       throw error;
     }
   }
@@ -510,7 +510,7 @@ class VastClient {
       //console.log(`Found ${result.length} Docker images`);
       return result;
     } catch (error) {
-      console.error("Error listing Docker images:", error);
+      // console.error("Error listing Docker images:", error);
       throw error;
     }
   }
@@ -532,7 +532,7 @@ class VastClient {
       //console.log(`Got user info for: ${result.username}`);
       return result;
     } catch (error) {
-      console.error("Error getting user info:", error);
+      // console.error("Error getting user info:", error);
       throw error;
     }
   }
