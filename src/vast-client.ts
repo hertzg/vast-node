@@ -148,14 +148,14 @@ class VastClient {
         // console.error("Request failed:", error.message);
         // Add more detailed logging for API errors
         if (error.response) {
-          console.error(
-            `API Error (${error.response.status}):`,
-            error.response.data,
-          );
+          // console.error(
+          //   `API Error (${error.response.status}):`,
+          //   error.response.data,
+          // );
         } else if (error.request) {
-          console.error("Network Error - No response received");
+          // console.error("Network Error - No response received");
         } else {
-          console.error("Request configuration error:", error.message);
+          // console.error("Request configuration error:", error.message);
         }
         return Promise.reject(error);
       },
