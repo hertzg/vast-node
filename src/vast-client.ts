@@ -145,7 +145,7 @@ class VastClient {
         return camelCaseData;
       },
       errorInterceptor: (error: AxiosError) => {
-        console.error("Request failed:", error.message);
+        // console.error("Request failed:", error.message);
         // Add more detailed logging for API errors
         if (error.response) {
           console.error(
